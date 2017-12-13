@@ -4,7 +4,7 @@ wrk.method = "POST"
 wrk.body   = "foo=bar&baz=quux"
 
 local counter = 1
-local bodies = {}
+local bodyContent = ""
 
 init = function(args)
     local parsedArgs = util.parseCommandLineArgs(args)
@@ -13,18 +13,13 @@ init = function(args)
     print ("===============")
     util.printTable(wrk.headers)
 
-    bodies = util.readFileLines(parsedArgs["file"])
-    print("bodies are")
+    bodyContent = util.readFile(parsedArgs["file"])
+    print("body is")
     print ("===============")
     util.printTable(bodies)
 end
 
 request = function()
-    local body = bodies[counter]
-    counter = counter + 1
-    if counter > #bodies then
-        counter = 1
-    end
-    local req = wrk.format(wrk.method, nil, nil, body)
+    local req = wrk.format(wrk.method, nil, nil, bodyContent)
     return req
 end

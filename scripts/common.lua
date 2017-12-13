@@ -6,7 +6,7 @@ local function printTable (t)
 	end
 end
 
-local function readFile(f) 
+local function readFileLines(f)
 	local content = {}
 	local f = io.open(f, "r")
 	if f~=nil then
@@ -15,6 +15,13 @@ local function readFile(f)
 		end
 		io.close(f)
 	end
+	return content
+end
+
+local function readFile(file)
+	local f = assert(io.open(file, "rb"))
+	local content = f:read("*all")
+	f:close()
 	return content
 end
 
@@ -40,7 +47,7 @@ local function setHeaders(args)
 	args = parseCommandLineArgs(args)
 
 	if(args["headers"] ~= nil) then
-		local headers = readFile(args["headers"])
+		local headers = readFileLines(args["headers"])
 		for k, v in pairs(headers) do
 			local headerKV = splitString(v, "=")
 			if(#headerKV == 2) then
@@ -51,6 +58,7 @@ local function setHeaders(args)
 end
 
 M.printTable = printTable
+M.readFileLines = readFileLines
 M.readFile = readFile
 M.splitString = splitString
 M.parseCommandLineArgs = parseCommandLineArgs

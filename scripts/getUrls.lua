@@ -11,7 +11,7 @@ init = function (args)
 
 	print ("file is ")
 	print(args["file"])
-	paths = util.readFile(args["file"])
+	paths = util.readFileLines(args["file"])
 
 	print("paths are")
 	util.printTable(paths)
