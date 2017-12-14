@@ -1,6 +1,7 @@
 local util = require("scripts/common")
 counter = 1
 args = {}
+paths = {}
 init = function (args)
 	util.setHeaders(args)
 

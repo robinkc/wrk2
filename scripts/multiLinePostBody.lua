@@ -16,7 +16,7 @@ init = function(args)
     bodyContent = util.readFile(parsedArgs["file"])
     print("body is")
     print ("===============")
-    util.printTable(bodies)
+    print(bodyContent)
 end
 
 request = function()
