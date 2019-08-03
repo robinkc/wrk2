@@ -21,6 +21,7 @@ static struct config {
     bool     u_latency;
     bool     dynamic;
     bool     record_all_responses;
+    char    *host;
     char    *script;
     SSL_CTX *ctx;
 } cfg;
@@ -58,7 +59,7 @@ static void usage() {
            "    -s, --script      <S>  Load Lua script file       \n"
            "    -H, --header      <H>  Add header to request      \n"
            "    -L  --latency          Print latency statistics   \n"
-           "    -U  --u_latency        Print uncorrceted latency statistics\n"
+           "    -U  --u_latency        Print uncorrected latency statistics\n"
            "        --timeout     <T>  Socket/request timeout     \n"
            "    -B, --batch_latency    Measure latency of whole   \n"
            "                           batches of pipelined ops   \n"
@@ -99,7 +100,9 @@ int main(int argc, char **argv) {
         sock.write    = ssl_write;
         sock.readable = ssl_readable;
     }
-
+	
+    cfg.host = host;
+	
     signal(SIGPIPE, SIG_IGN);
     signal(SIGINT,  SIG_IGN);
 
@@ -118,14 +121,14 @@ int main(int argc, char **argv) {
     }
     
     uint64_t connections = cfg.connections / cfg.threads;
-    uint64_t throughput = cfg.rate / cfg.threads;
+    double throughput    = (double)cfg.rate / cfg.threads;
     uint64_t stop_at     = time_us() + (cfg.duration * 1000000);
 
     for (uint64_t i = 0; i < cfg.threads; i++) {
         thread *t = &threads[i];
         t->loop        = aeCreateEventLoop(10 + cfg.connections * 3);
         t->connections = connections;
-        t->throughput = throughput;;
+        t->throughput = throughput;
         t->stop_at     = stop_at;
 
         t->L = script_create(cfg.script, url, headers);
@@ -570,7 +573,7 @@ static int response_complete(http_parser *parser) {
 static void socket_connected(aeEventLoop *loop, int fd, void *data, int mask) {
     connection *c = data;
 
-    switch (sock.connect(c)) {
+    switch (sock.connect(c, cfg.host)) {
         case OK:    break;
         case ERROR: goto error;
         case RETRY: return;
