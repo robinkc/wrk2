@@ -3,6 +3,8 @@ local util = require("scripts/common")
 local method = "GET"
 local bodies = {}
 local bodiesCounter = 1
+local urls = {}
+local urlsCounter = 1
 local headers = {}
 local randomHeaders = {}
 local randomHeadersCounter = 1
@@ -16,6 +18,16 @@ init = function(args)
     if(parsedArgs["method"] ~= nil) then
     	method = parsedArgs["method"]
     end
+
+    if(parsedArgs["urls"] ~= nil) then
+        urls = util.readFileLines(parsedArgs["urls"])
+    else
+        urls[1] = wrk.path
+    end
+    print("urls are")
+    print ("===============")
+    util.printTable(urls)
+
 
     local _h = util.readFileLines(parsedArgs["headers"])
 	for k, v in pairs(_h) do
@@ -47,10 +59,16 @@ init = function(args)
 end
 
 request = function()
+    local url = urls[urlsCounter]
+    urlsCounter = urlsCounter + 1
+    if urlsCounter > #urls then
+        urlsCounter = 1
+    end
+
     local body = bodies[bodiesCounter]
     bodiesCounter = bodiesCounter + 1
     if bodiesCounter > #bodies then
-        counter = 1
+        bodiesCounter = 1
     end
 
     local localHeaders = {}
@@ -69,6 +87,6 @@ request = function()
 		end
 	end
 	
-    local req = wrk.format(method, wrk.path, localHeaders, body)
+    local req = wrk.format(method, url, localHeaders, body)
     return req
 end
