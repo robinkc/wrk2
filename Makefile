@@ -1,5 +1,5 @@
-CFLAGS  := -std=c99 -Wall -O2 -D_REENTRANT
-LIBS    := -lpthread -lm -lcrypto -lssl
+CFLAGS  := -std=c99 -Wall -O2 -D_REENTRANT -I/usr/local/opt/openssl/include
+LIBS    := -lpthread -lm -lcrypto -lssl -L/usr/local/opt/openssl/lib
 
 TARGET  := $(shell uname -s | tr '[A-Z]' '[a-z]' 2>/dev/null || echo unknown)
 
